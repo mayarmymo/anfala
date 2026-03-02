@@ -38,6 +38,10 @@ class _StorePageState extends State<StorePage> {
                         userStars -= item.price;
                         item.isBought = true;
                       });
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("ليس لديك نجوم كافية! ⭐")),
+                      );
                     }
                   },
                   child: Text(item.isBought ? "تم الشراء" : "${item.price} ⭐"),
