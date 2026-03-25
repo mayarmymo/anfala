@@ -1,0 +1,38 @@
+name: anfalahmad
+description: "A new Flutter project for children learning."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+  shared_preferences: ^2.2.29
+  # تم الإبقاء على audioplayers وإزالة flutter_tts
+  audioplayers: ^6.1.0 
+  speech_to_text: ^7.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Vazirmatn
+      fonts:
+        - asset: assets/fonts/Vazirmatn-Regular.ttf
+        - asset: assets/fonts/Vazirmatn-Bold.ttf
+          weight: 700
+
+  assets:
+    - assets/images/
+    - assets/sounds/
+    - assets/sounds/letters/
