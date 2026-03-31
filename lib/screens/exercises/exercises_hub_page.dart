@@ -111,7 +111,7 @@ class ExercisesHubPage extends StatelessWidget {
         child: IconButton(
           // في RTL، زر الرجوع يجب أن يشير لليمين للخروج من الصفحة
           icon: const Icon(Icons.arrow_forward_ios_rounded,
-              color: pinoOrange, size: 18),
+              color: pinoNavy, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
       ),

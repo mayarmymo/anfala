@@ -10,12 +10,7 @@ ThemeData appTheme() {
     ),
     // تحسين مظهر النصوص لتدعم العربية بشكل أفضل
     fontFamily: 'Vazirmatn', // تأكد من إضافة الخط في pubspec.yaml إذا أردت استخدامه
-    // تنسيق موحد للبطاقات (Cards)
-    cardTheme: CardTheme(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-    ),
+    
     // تنسيق موحد للأزرار الكبيرة
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(

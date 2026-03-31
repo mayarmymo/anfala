@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+// ملاحظة: تأكد من أن هذا المسار يؤدي فعلياً لمكان ملف الصفحة السابقة
 import '../pronunciation/drag_drop_page.dart';
+
+const Color pinoNavy = Color(0xFF1E2A47);
 
 class LevelsPage extends StatefulWidget {
   const LevelsPage({super.key});
@@ -15,16 +18,37 @@ class _LevelsPageState extends State<LevelsPage> {
 
   final List<Map<String, dynamic>> _levelData = [
     {
-      'level': 1, 'title': "المرحلة الأولى: القمر", 'desc': "رتب حروف كلمة قمر", 'icon': Icons.nightlight_round, 'color': Colors.purple,
-      'wordTitle': 'قمر', 'targetLetters': ['ق', 'م', 'ر'], 'nextLevelKey': 'level_2_unlocked',
+      'level': 1,
+      'title': "المرحلة الأولى: القمر",
+      'desc': "رتب حروف كلمة قمر",
+      'icon': Icons.nightlight_round,
+      'color': Colors.purple,
+      'wordTitle': 'قمر',
+      'targetLetters': ['ق', 'م', 'ر'],
+      'imagePath': 'assets/images/moon.jpg',
+      'nextLevelKey': 'level_2_unlocked',
     },
     {
-      'level': 2, 'title': "المرحلة الثانية: الأسد", 'desc': "رتب حروف كلمة أسد", 'icon': Icons.pets, 'color': Colors.orange,
-      'wordTitle': 'أسد', 'targetLetters': ['أ', 'س', 'د'], 'nextLevelKey': 'level_3_unlocked',
+      'level': 2,
+      'title': "المرحلة الثانية: الأسد",
+      'desc': "رتب حروف كلمة أسد",
+      'icon': Icons.pets,
+      'color': Colors.orange,
+      'wordTitle': 'أسد',
+      'targetLetters': ['أ', 'س', 'د'],
+      'imagePath': 'assets/images/lion.jpg',
+      'nextLevelKey': 'level_3_unlocked',
     },
     {
-      'level': 3, 'title': "المرحلة الثالثة: الجمل", 'desc': "رتب حروف كلمة جمل", 'icon': Icons.terrain, 'color': Colors.brown,
-      'wordTitle': 'جمل', 'targetLetters': ['ج', 'م', 'ل'], 'nextLevelKey': null,
+      'level': 3,
+      'title': "المرحلة الثالثة: الجمل",
+      'desc': "رتب حروف كلمة جمل",
+      'icon': Icons.terrain,
+      'color': Colors.brown,
+      'wordTitle': 'جمل',
+      'targetLetters': ['ج', 'م', 'ل'],
+      'imagePath': 'assets/images/camel.jpg',
+      'nextLevelKey': null,
     },
   ];
 
@@ -34,7 +58,6 @@ class _LevelsPageState extends State<LevelsPage> {
     _loadLevelStatus();
   }
 
-  // تحميل حالة المراحل (مفتوحة/مغلقة)
   Future<void> _loadLevelStatus() async {
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
@@ -50,71 +73,72 @@ class _LevelsPageState extends State<LevelsPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-      appBar: AppBar(
-        title: const Text("ترتيب الكلمات", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF1E2A47), // pinoNavy
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 18),
-          onPressed: () => Navigator.pop(context),
+        appBar: AppBar(
+          title: const Text("ترتيب الكلمات",
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          backgroundColor: pinoNavy,
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                  color: Colors.white, shape: BoxShape.circle),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_forward_ios_rounded,
+                    color: pinoNavy, size: 18),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ),
         ),
-        centerTitle: true,
-      ),
-      body: Container(
-        color: Colors.white,
-        child: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: _levelData.length,
-        itemBuilder: (context, index) {
-          final level = _levelData[index];
-          bool isLocked = false;
-          if (level['level'] == 2) {
-            isLocked = !_isLevel2Unlocked;
-          } else if (level['level'] == 3) {
-            isLocked = !_isLevel3Unlocked;
-          }
+        body: ListView.builder(
+          padding: const EdgeInsets.all(20),
+          itemCount: _levelData.length,
+          itemBuilder: (context, index) {
+            final level = _levelData[index];
+            bool isLocked = (level['level'] == 2 && !_isLevel2Unlocked) ||
+                (level['level'] == 3 && !_isLevel3Unlocked);
 
-          return _buildLevelCard(
-            context,
-            level['level'],
-            level['title'],
-            level['desc'],
-            level['icon'],
-            level['color'],
-            isLocked,
-            () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DragDropPage(
-                    wordTitle: level['wordTitle'],
-                    targetLetters: level['targetLetters'] as List<String>,
-                    nextLevelKey: level['nextLevelKey'],
-                  ),
+            return Card(
+              margin: const EdgeInsets.only(bottom: 15),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              child: ListTile(
+                onTap: isLocked
+                    ? () => ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("🔒 هذه المرحلة مغلقة!")))
+                    : () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DragDropPage(
+                              wordTitle: level['wordTitle'],
+                              targetLetters: level['targetLetters'],
+                              imagePath: level['imagePath'],
+                              nextLevelKey: level['nextLevelKey'],
+                            ),
+                          ),
+                        ).then((_) => _loadLevelStatus()),
+                leading: CircleAvatar(
+                  backgroundColor: isLocked
+                      ? Colors.grey[300]
+                      : level['color'].withOpacity(0.1),
+                  child: Icon(level['icon'],
+                      color: isLocked ? Colors.grey : level['color']),
                 ),
-              ).then((_) => _loadLevelStatus());
-            },
-          );
-        },
-      ),
-      ),
-      ),
-    );
-  }
-
-  Widget _buildLevelCard(BuildContext context, int level, String title, String desc, IconData icon, Color color, bool isLocked, VoidCallback onTap) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 15),
-      child: ListTile(
-        onTap: isLocked 
-            ? () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("عليك إنهاء المرحلة السابقة أولاً! 🔒")))
-            : onTap,
-        leading: CircleAvatar(
-          backgroundColor: isLocked ? Colors.grey.shade300 : color.withOpacity(0.1),
-          child: Icon(icon, color: isLocked ? Colors.grey : color),
+                title: Text(level['title'],
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isLocked ? Colors.grey : Colors.black)),
+                subtitle: Text(level['desc'],
+                    style: const TextStyle(color: pinoNavy)),
+                trailing: Icon(isLocked ? Icons.lock : Icons.arrow_forward_ios,
+                    size: 16),
+              ),
+            );
+          },
         ),
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: isLocked ? Colors.grey : Colors.black)),
-        subtitle: Text(desc),
-        trailing: Icon(isLocked ? Icons.lock : Icons.arrow_forward_ios, size: 16, color: isLocked ? Colors.grey : Colors.black),
       ),
     );
   }

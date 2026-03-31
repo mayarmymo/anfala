@@ -2,7 +2,7 @@
 
 class StoreItem {
   final String id;
-  final String name;      // ستحتوي على "قبعة" أو "تاج"
+  final String name;      
   final String imagePath; 
   final int price;
   bool isBought;

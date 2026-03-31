@@ -26,17 +26,19 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Row(
           children: [
             ClipOval(
-              child: Image.asset('assets/images/penguin_3d.jpg', width: 40, height: 40, fit: BoxFit.cover),
+              child: Image.asset('assets/images/penguin_3d.jpg',
+                  width: 40, height: 40, fit: BoxFit.cover),
             ),
             const SizedBox(width: 10),
-            const Text("قصة بينو", style: TextStyle(color: pinoNavy, fontWeight: FontWeight.bold)),
+            const Text("قصة بينو",
+                style: TextStyle(color: pinoNavy, fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-             const Text(
+            const Text(
               "بينو ليس مجرد تطبيق، بل هو صديق قادم من القطب المتجمد! ❄️\n\n"
               "لقد قطع مسافات طويلة وترك الجليد خلفه ليأتي إلينا هنا، ليكون دليلك في رحلة التعلم ويساعدك على تطوير مهاراتك خطوة بخطوة. استمتع بالرحلة معه!",
               style: TextStyle(color: pinoNavy, fontSize: 16, height: 1.5),
@@ -53,7 +55,9 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("شكراً بينو!", style: TextStyle(color: pinoOrange, fontWeight: FontWeight.bold)),
+            child: const Text("شكراً بينو!",
+                style:
+                    TextStyle(color: pinoOrange, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -62,24 +66,33 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: pinoNavy,
-        elevation: 0,
-        title: const Text(
-          "الإعدادات",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          backgroundColor: pinoNavy,
+          elevation: 0,
+          title: const Text(
+            "الإعدادات",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                  color: Colors.white, shape: BoxShape.circle),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_forward_ios_rounded,
+                    color: pinoNavy, size: 18),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ),
         ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: SingleChildScrollView(
+        body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -113,13 +126,18 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildSettingTile(
                 icon: Icons.language,
                 title: "لغة التطبيق",
-                trailing: const Text("العربية", style: TextStyle(color: pinoNavy, fontWeight: FontWeight.bold, fontSize: 14)),
+                trailing: const Text("العربية",
+                    style: TextStyle(
+                        color: pinoNavy,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14)),
                 onTap: null,
               ),
               _buildSettingTile(
                 icon: Icons.info_outline,
                 title: "عن تطبيق بينو",
-                trailing: const Icon(Icons.arrow_back_ios_new, size: 16, color: Colors.grey),
+                trailing: const Icon(Icons.arrow_back_ios_new,
+                    size: 16, color: Colors.grey),
                 onTap: () => _showPinoStory(context), // استدعاء القصة
               ),
 
@@ -133,13 +151,23 @@ class _SettingsPageState extends State<SettingsPage> {
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            const Text("مركز المساعدة", textAlign: TextAlign.right, style: TextStyle(color: pinoNavy, fontWeight: FontWeight.bold)),
+                            const Text("مركز المساعدة",
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                    color: pinoNavy,
+                                    fontWeight: FontWeight.bold)),
                             const SizedBox(width: 10),
-                            ClipOval(child: Image.asset('assets/images/penguin_3d.jpg', width: 35, height: 35, fit: BoxFit.cover)),
+                            ClipOval(
+                                child: Image.asset(
+                                    'assets/images/penguin_3d.jpg',
+                                    width: 35,
+                                    height: 35,
+                                    fit: BoxFit.cover)),
                           ],
                         ),
                         content: SingleChildScrollView(
@@ -154,24 +182,36 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                               children: <TextSpan>[
                                 TextSpan(text: "أهلاً بك في عالم بينو!\n\n"),
-                                TextSpan(text: "صديقك بينو هنا ليجعل رحلة تعلم الحروف والكلمات ممتعة ومسلية.\n\n"),
+                                TextSpan(
+                                    text:
+                                        "صديقك بينو هنا ليجعل رحلة تعلم الحروف والكلمات ممتعة ومسلية.\n\n"),
                                 TextSpan(
                                   text: "كيف ألعب؟\n",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                TextSpan(text: "• اسحب الحروف المبعثرة وضعها في الخانات الصحيحة.\n"),
-                                TextSpan(text: "• استمع جيداً لنطق كل حرف تضعه!\n\n"),
+                                TextSpan(
+                                    text:
+                                        "• اسحب الحروف المبعثرة وضعها في الخانات الصحيحة.\n"),
+                                TextSpan(
+                                    text:
+                                        "• استمع جيداً لنطق كل حرف تضعه!\n\n"),
                                 TextSpan(
                                   text: "ما هي المكافأة؟\n",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                TextSpan(text: "• مع كل كلمة صحيحة، ستحصل على نجوم لامعة! 🌟\n"),
-                                TextSpan(text: "• استخدم نجومك في المتجر لشراء أشياء رائعة لبينو.\n\n"),
+                                TextSpan(
+                                    text:
+                                        "• مع كل كلمة صحيحة، ستحصل على نجوم لامعة! 🌟\n"),
+                                TextSpan(
+                                    text:
+                                        "• استخدم نجومك في المتجر لشراء أشياء رائعة لبينو.\n\n"),
                                 TextSpan(
                                   text: "لا تقلق إذا أخطأت!\n",
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                TextSpan(text: "• المحاولة مرة أخرى هي سر النجاح. استمر في اللعب!\n\n"),
+                                TextSpan(
+                                    text:
+                                        "• المحاولة مرة أخرى هي سر النجاح. استمر في اللعب!\n\n"),
                                 TextSpan(
                                   text: "استمتع بالرحلة!",
                                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -182,9 +222,11 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                         actions: [
                           TextButton(
-                            onPressed: () => Navigator.pop(ctx), 
-                            child: const Text("فهمت، لنبدأ!", style: TextStyle(color: pinoOrange, fontWeight: FontWeight.bold))
-                          ),
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text("فهمت، لنبدأ!",
+                                  style: TextStyle(
+                                      color: pinoOrange,
+                                      fontWeight: FontWeight.bold))),
                         ],
                       ),
                     );
@@ -254,7 +296,8 @@ class _SettingsPageState extends State<SettingsPage> {
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
       ),
       subtitle: subtitle != null
-          ? Text(subtitle, style: const TextStyle(fontSize: 13, color: Colors.grey))
+          ? Text(subtitle,
+              style: const TextStyle(fontSize: 13, color: Colors.grey))
           : null,
       trailing: trailing,
     );

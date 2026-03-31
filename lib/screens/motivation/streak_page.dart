@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
+// الألوان الخاصة بهوية "بينو" البصرية
+const Color pinoNavy = Color(0xFF1E2A47); // الكحلي الأساسي
+const Color pinoOrange = Color(0xFFFF9F1C); // البرتقالي الثانوي
+const String appFont = 'Vazirmatn';
+
 // تأكدي من تسمية الكلاس ليتوافق مع طريقة استدعائك له في التطبيق
 class StreakPage extends StatelessWidget {
   const StreakPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // الألوان الخاصة بهوية "بينو" البصرية
-    const Color pinoNavy = Color(0xFF1E2A47); // الكحلي الأساسي
-    const Color pinoOrange = Color(0xFFFF9F1C); // البرتقالي الثانوي
-    const String appFont = 'Vazirmatn'; // الخط المطلوب (تأكدي من تعريفه في pubspec.yaml)
-    // بيانات الأيام (تجريبي، يمكنك ربطها بقاعدة البيانات لاحقاً)
     final List<Map<String, dynamic>> weekDays = [
       {"day": "السبت", "short": "س", "done": true},
       {"day": "الأحد", "short": "اح", "done": true},
@@ -21,28 +21,33 @@ class StreakPage extends StatelessWidget {
       {"day": "الجمعة", "short": "ج", "done": false}, // اليوم الحالي
     ];
 
-    return Scaffold(
-      backgroundColor: Colors.white, 
-     appBar: AppBar(
-  backgroundColor: pinoNavy,
-  elevation: 0,
-  automaticallyImplyLeading: false, // مهم جداً
-  title: const Text(
-    " السلسلة ", // أو عنوان الصفحة
-    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-  ),
-  centerTitle: true,
-  leading: Align(
-    alignment: Alignment.centerRight,
-    child: IconButton(
-      icon: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 18),
-      onPressed: () => Navigator.pop(context),
-    ),
-  ),
-),
-      body: Directionality(
-        textDirection: TextDirection.rtl, // لضمان اتجاه النص العربي
-        child: SingleChildScrollView(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: pinoNavy,
+          elevation: 0,
+          automaticallyImplyLeading: false, // مهم جداً
+          title: const Text(
+            " السلسلة ", // أو عنوان الصفحة
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                  color: Colors.white, shape: BoxShape.circle),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_forward_ios_rounded,
+                    color: pinoNavy, size: 18),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ),
+        ),
+        body: SingleChildScrollView(
           child: Column(
             children: [
               // --- شعار البطريق والرقم (العنصر الأساسي الجديد) ---
@@ -50,7 +55,8 @@ class StreakPage extends StatelessWidget {
                 children: [
                   // تأكدي من إضافة ملف الصورة إلى Assets في pubspec.yaml
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(100), // جعل الصورة دائرية تماماً
+                    borderRadius:
+                        BorderRadius.circular(100), // جعل الصورة دائرية تماماً
                     child: Image.asset(
                       'assets/images/penguin_3d.jpg', // مسار ملف البطريق (image_4.png)
                       height: 120, // ضبط الحجم ليتناسب مع التصميم
@@ -58,17 +64,19 @@ class StreakPage extends StatelessWidget {
                       fit: BoxFit.cover, // ملء الدائرة بالكامل
                       // التعامل مع الأخطاء في حال لم يتم العثور على الملف
                       errorBuilder: (context, error, stackTrace) {
-                        return const Text("🐧", style: TextStyle(fontSize: 80)); // إيموجي بديل
+                        return const Text("🐧",
+                            style: TextStyle(fontSize: 80)); // إيموجي بديل
                       },
                     ),
                   ),
-                  
+
                   const SizedBox(height: 10),
-                  
+
                   // رقم السلسلة (مثال: 12 يوم)
                   const Text(
                     "12",
-                    style: TextStyle( // تكبير الرقم قليلاً
+                    style: TextStyle(
+                      // تكبير الرقم قليلاً
                       fontFamily: appFont, // خط Vazirmatn
                       fontSize: 110, // حجم كبير مثل تصميم Duolingo
                       fontWeight: FontWeight.w900, // عريض جداً
@@ -76,7 +84,7 @@ class StreakPage extends StatelessWidget {
                       height: 1.0, // ضبط التباعد العمودي للنص
                     ),
                   ),
-                  
+
                   // النص "يوم من الاستمرار"
                   const Text(
                     "يوم من الاستمرار!",
@@ -96,7 +104,8 @@ class StreakPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                   decoration: BoxDecoration(
                     color: pinoNavy.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(25),
@@ -123,15 +132,20 @@ class StreakPage extends StatelessWidget {
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: dayData["done"] ? pinoOrange : Colors.transparent, // برتقالي إذا اكتمل
+                              color: dayData["done"]
+                                  ? pinoOrange
+                                  : Colors.transparent, // برتقالي إذا اكتمل
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: dayData["done"] ? pinoOrange : Colors.white.withOpacity(0.5),
+                                color: dayData["done"]
+                                    ? pinoOrange
+                                    : Colors.white.withOpacity(0.5),
                                 width: 2,
                               ),
                             ),
                             child: dayData["done"]
-                                ? const Icon(Icons.check, color: pinoNavy, size: 25) // علامة صح
+                                ? const Icon(Icons.check,
+                                    color: pinoNavy, size: 25) // علامة صح
                                 : null,
                           ),
                         ],
@@ -151,7 +165,7 @@ class StreakPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: appFont,
-                    color: Colors.grey,
+                    color: pinoNavy,
                     fontSize: 18,
                   ),
                 ),
