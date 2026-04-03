@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
+import 'evaluation_page.dart'; // استيراد صفحة التقييم
+
 const Color pinoNavy = Color(0xFF1E2A47);
 const Color pinoOrange = Color(0xFFFF9F1C);
 
@@ -67,13 +69,16 @@ class _SpeechPracticePageState extends State<SpeechPracticePage> {
     String spoken = normalize(_recognizedText);
     String target = normalize(widget.targetWord);
 
+    int score = 0;
     if (spoken.contains(target)) {
-      _feedbackMessage = "أحسنت! نطق صحيح 🎉";
-      _feedbackColor = pinoOrange;
+      score = 100; // 100 نقطة للنطق الصحيح
     } else {
-      _feedbackMessage = "حاول مرة أخرى ❌";
-      _feedbackColor = pinoOrange;
+      score = 0; // 0 نقطة للنطق الخاطئ
     }
+
+    // الانتقال إلى صفحة التقييم
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => EvaluationPage(score: score)));
   }
 
   @override
@@ -83,27 +88,28 @@ class _SpeechPracticePageState extends State<SpeechPracticePage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: const Text(
-            "تمرين النطق",
-            style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Vazirmatn'),
-          ),
-          backgroundColor: pinoNavy,
+          backgroundColor: Colors.white,
+          elevation: 0,
           centerTitle: true,
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: pinoNavy, size: 18),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
+          ),
+          title: const Text(
+            "تمرين النطق",
+            style: TextStyle(
+                color: pinoNavy,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Vazirmatn'),
           ),
         ),
         body: Center(

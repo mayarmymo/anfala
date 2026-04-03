@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'evaluation_page.dart'; // استيراد صفحة التقييم
 
 const Color pinoNavy = Color(0xFF1E2A47);
 const Color pinoOrange = Color(0xFFFF9F1C);
@@ -87,16 +88,21 @@ class _DragDropPageState extends State<DragDropPage> {
       await prefs.setBool(widget.nextLevelKey!, true);
     }
 
-    setState(() => _isSuccess = true);
-    _showFeedback();
+    // بدلاً من SnackBar، ننتقل إلى صفحة التقييم
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            const EvaluationPage(score: 100), // 100 نقطة للنجاح
+      ),
+    );
   }
 
-  void _showFeedback() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("أحسنت! إجابة رائعة 🎉", textAlign: TextAlign.center),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+  void _showErrorFeedback() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EvaluationPage(score: 0), // 0 نقطة للخطأ
       ),
     );
     Future.delayed(const Duration(seconds: 3), () {
@@ -110,118 +116,118 @@ class _DragDropPageState extends State<DragDropPage> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text("رتب كلمة: ${widget.wordTitle}"),
-          backgroundColor: pinoNavy,
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
+        body: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(top: 100),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // الصورة تظهر دائماً في الأعلى
+                    Image.asset(widget.imagePath,
+                        width: 200,
+                        height: 200,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.image,
+                                size: 100, color: Colors.grey)),
+                    const SizedBox(height: 20),
+
+                    // النص التوضيحي
+                    Text(
+                      _isSuccess
+                          ? "رائع! لقد كونت كلمة: ${widget.wordTitle}"
+                          : "اسحب الحرف إلى مكانه الصحيح",
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: _isSuccess ? Colors.green : pinoNavy),
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // منطقة الإفلات (الخانات)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children:
+                          List.generate(widget.targetLetters.length, (index) {
+                        return DragTarget<String>(
+                          onAccept: (data) {
+                            if (data == widget.targetLetters[index]) {
+                              _playLetterSound(data);
+                              setState(() {
+                                droppedLetters[index] = data;
+                                shuffledLetters.remove(data);
+                              });
+                              _checkResult(); // إذا كان صحيحاً
+                            } else {
+                              _showErrorFeedback(); // إذا كان خاطئاً
+                            }
+                          },
+                          builder: (context, candidateData, rejectedData) {
+                            return Container(
+                              width: 70,
+                              height: 70,
+                              margin: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: droppedLetters[index] != null
+                                    ? pinoOrange
+                                    : Colors.grey[200],
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                    color: pinoNavy.withOpacity(0.3), width: 2),
+                              ),
+                              child: Center(
+                                child: Text(droppedLetters[index] ?? "",
+                                    style: const TextStyle(
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white)),
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                    ),
+
+                    const SizedBox(height: 60),
+
+                    // منطقة الحروف (تختفي عند النجاح)
+                    if (!_isSuccess)
+                      Wrap(
+                        spacing: 20,
+                        children: shuffledLetters.map((letter) {
+                          return Draggable<String>(
+                            data: letter,
+                            feedback: Material(
+                                color: Colors.transparent,
+                                child: _buildLetterBox(letter, true)),
+                            childWhenDragging: Opacity(
+                                opacity: 0.3,
+                                child: _buildLetterBox(letter, false)),
+                            child: _buildLetterBox(letter, false),
+                          );
+                        }).toList(),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ),
-        body: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // الصورة تظهر دائماً في الأعلى
-                Image.asset(widget.imagePath,
-                    width: 200,
-                    height: 200,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.image, size: 100, color: Colors.grey)),
-                const SizedBox(height: 20),
-
-                // النص التوضيحي
-                Text(
-                  _isSuccess
-                      ? "رائع! لقد كونت كلمة: ${widget.wordTitle}"
-                      : "اسحب الحرف إلى مكانه الصحيح",
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: _isSuccess ? Colors.green : pinoNavy),
+            // زر الرجوع
+            Positioned(
+              top: 45,
+              right: 20,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_forward_ios_rounded,
+                      color: pinoNavy, size: 18),
+                  onPressed: () => Navigator.pop(context),
                 ),
-
-                const SizedBox(height: 40),
-
-                // منطقة الإفلات (الخانات)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(widget.targetLetters.length, (index) {
-                    return DragTarget<String>(
-                      onAccept: (data) {
-                        if (data == widget.targetLetters[index]) {
-                          _playLetterSound(data);
-                          setState(() {
-                            droppedLetters[index] = data;
-                            shuffledLetters.remove(data);
-                          });
-                          _checkResult();
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("حاول وضع الحرف في مكان آخر!"),
-                                  duration: Duration(milliseconds: 500)));
-                        }
-                      },
-                      builder: (context, candidateData, rejectedData) {
-                        return Container(
-                          width: 70,
-                          height: 70,
-                          margin: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: droppedLetters[index] != null
-                                ? pinoOrange
-                                : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(
-                                color: pinoNavy.withOpacity(0.3), width: 2),
-                          ),
-                          child: Center(
-                            child: Text(droppedLetters[index] ?? "",
-                                style: const TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
-                          ),
-                        );
-                      },
-                    );
-                  }),
-                ),
-
-                const SizedBox(height: 60),
-
-                // منطقة الحروف (تختفي عند النجاح)
-                if (!_isSuccess)
-                  Wrap(
-                    spacing: 20,
-                    children: shuffledLetters.map((letter) {
-                      return Draggable<String>(
-                        data: letter,
-                        feedback: Material(
-                            color: Colors.transparent,
-                            child: _buildLetterBox(letter, true)),
-                        childWhenDragging: Opacity(
-                            opacity: 0.3,
-                            child: _buildLetterBox(letter, false)),
-                        child: _buildLetterBox(letter, false),
-                      );
-                    }).toList(),
-                  ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

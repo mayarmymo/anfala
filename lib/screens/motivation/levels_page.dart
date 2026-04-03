@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ملاحظة: تأكد من أن هذا المسار يؤدي فعلياً لمكان ملف الصفحة السابقة
 import '../pronunciation/drag_drop_page.dart';
 
+// تم تعريفها هنا
 const Color pinoNavy = Color(0xFF1E2A47);
 
 class LevelsPage extends StatefulWidget {
@@ -75,16 +76,15 @@ class _LevelsPageState extends State<LevelsPage> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("ترتيب الكلمات",
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          backgroundColor: pinoNavy,
+              style: TextStyle(color: pinoNavy, fontWeight: FontWeight.bold)),
+          backgroundColor: Colors.white,
           centerTitle: true,
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: pinoNavy, size: 18),

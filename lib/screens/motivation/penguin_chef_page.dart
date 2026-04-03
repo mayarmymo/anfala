@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../pronunciation/evaluation_page.dart'; // استيراد صفحة التقييم
 
 const Color pinoNavy = Color(0xFF1E2A47); // الكحلي الأساسي
 const Color pinoOrange = Color(0xFFFF9F1C); // البرتقالي
@@ -51,74 +52,24 @@ class _PinoChefPageState extends State<PinoChefPage>
   }
 
   void _showSuccessResult() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // ظهور صورة بينو عند النجاح
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                'assets/images/chef.jpg',
-                height: 120,
-                errorBuilder: (c, e, s) => const Icon(
-                    Icons.face_retouching_natural,
-                    size: 80,
-                    color: Colors.orange),
-              ),
-            ),
-            const SizedBox(height: 15),
-            Text("أحسنت! شيف متميز",
-                style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: pinoOrange,
-                    fontFamily: 'Vazirmatn')),
-            const SizedBox(height: 10),
-            const Text("😋 يم يم! طبخة (مكرونة) شهية جداً",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontFamily: 'Vazirmatn')),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: pinoOrange,
-                shape: const StadiumBorder(),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-              ),
-              onPressed: () {
-                setState(() => potIngredients.clear());
-                Navigator.pop(context);
-              },
-              child: const Text("وصفة جديدة",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Vazirmatn')),
-            )
-          ],
-        ),
+    // بدلاً من AlertDialog، ننتقل إلى صفحة التقييم
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EvaluationPage(score: 100), // 100 نقطة للنجاح
       ),
     );
   }
 
   void _showErrorResult() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text("حاول مرة أخرى، احترقت المكرونة! 🔥",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontFamily: 'Vazirmatn')),
-        backgroundColor: pinoOrange,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    // بدلاً من SnackBar، ننتقل إلى صفحة التقييم
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EvaluationPage(score: 0), // 0 نقطة للخطأ
       ),
     );
-    setState(() => potIngredients.clear());
+    setState(() => potIngredients.clear()); // مسح المكونات بعد الخطأ
   }
 
   @override
@@ -128,14 +79,22 @@ class _PinoChefPageState extends State<PinoChefPage>
       child: Scaffold(
         backgroundColor: pinoBg,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.white,
           elevation: 0,
           automaticallyImplyLeading: false, // لنتحكم بمكان الزر يدوياً
+          centerTitle: true,
+          title: const Text(
+            "تحدي الطبخ",
+            style: TextStyle(
+                color: pinoNavy,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Vazirmatn'),
+          ),
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: Color(0xFF1E2A47), size: 18),
@@ -156,21 +115,13 @@ class _PinoChefPageState extends State<PinoChefPage>
       ),
     );
   }
-
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, // محاذاة لليمين (في RTL)
         children: [
-          Text(
-            "تحدي الطبخ ",
-            style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: pinoNavy,
-                fontFamily: 'Vazirmatn'),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 20),
           Text(
             "رتب الحروف لتصنع طبق (مكرونة)",
             style: TextStyle(

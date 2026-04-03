@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'movements_page.dart';
 import 'advanced_exercises_page.dart';
-import '../pronunciation/speech_practice_page.dart';
 import '../motivation/penguin_chef_page.dart';
 import 'leaderboard_page.dart';
 import 'letter_selection_page.dart';
+import '../pronunciation/speech_practice_page.dart'; // تم نقل الاستيراد
 
 const Color pinoNavy = Color(0xFF1E2A47);
 const Color pinoOrange = Color(0xFFFF9F1C);
@@ -23,11 +23,11 @@ class ExercisesHubPage extends StatelessWidget {
           title: const Text(
             "التمارين التعليمية",
             style: TextStyle(
-                color: Colors.white,
+                color: pinoNavy,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Vazirmatn'),
           ),
-          backgroundColor: pinoNavy,
+          backgroundColor: Colors.white,
           centerTitle: true,
           elevation: 0,
           leading: _buildUnifiedBackButton(context),
@@ -56,15 +56,15 @@ class ExercisesHubPage extends StatelessWidget {
                 color: pinoOrange,
                 page: const PinoChefPage()),
             _buildExerciseCard(context,
-                title: "لوحة المتصدرين",
-                icon: Icons.leaderboard,
-                color: Colors.blueAccent,
-                page: const LeaderboardPage()),
-            _buildExerciseCard(context,
                 title: "أين يختبئ بينو؟",
                 icon: Icons.help_outline,
                 color: Colors.pinkAccent,
                 page: const LetterSelectionPage()),
+            _buildExerciseCard(context,
+                title: "لوحة المتصدرين",
+                icon: Icons.leaderboard,
+                color: Colors.blueAccent,
+                page: const LeaderboardPage()),
           ],
         ),
       ),
@@ -84,8 +84,8 @@ class ExercisesHubPage extends StatelessWidget {
         contentPadding: const EdgeInsets.all(15),
         leading: Container(
           padding: const EdgeInsets.all(10),
-          decoration:
-              BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+          decoration: BoxDecoration(
+              color: color.withOpacity(0.1), shape: BoxShape.circle),
           child: Icon(icon, color: color, size: 30),
         ),
         title: Text(title,
@@ -95,7 +95,8 @@ class ExercisesHubPage extends StatelessWidget {
                 fontFamily: 'Vazirmatn',
                 color: pinoNavy)),
         // في RTL، السهم لليسار يعني "ادخل لهذه الصفحة"
-        trailing: const Icon(Icons.arrow_back_ios, size: 16, color: Colors.grey),
+        trailing:
+            const Icon(Icons.arrow_back_ios, size: 16, color: Colors.grey),
         onTap: () => Navigator.push(
             context, MaterialPageRoute(builder: (context) => page)),
       ),
@@ -106,8 +107,8 @@ class ExercisesHubPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
-        decoration:
-            const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+            color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
         child: IconButton(
           // في RTL، زر الرجوع يجب أن يشير لليمين للخروج من الصفحة
           icon: const Icon(Icons.arrow_forward_ios_rounded,

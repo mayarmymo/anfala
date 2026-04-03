@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/store_item.dart';
 
+// تم تعريفها هنا
 const Color pinoNavy = Color(0xFF1E2A47);
 const Color pinoOrange = Color(0xFFFF9F1C);
 
@@ -56,13 +57,13 @@ class _StorePageState extends State<StorePage> {
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F5FA),
         appBar: AppBar(
-          backgroundColor: pinoNavy,
+          backgroundColor: Colors.white,
           elevation: 0,
           automaticallyImplyLeading: false,
           title: const Text(
             "المتجر",
             style: TextStyle(
-                color: Colors.white,
+                color: pinoNavy,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Vazirmatn'),
           ),
@@ -70,8 +71,8 @@ class _StorePageState extends State<StorePage> {
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: pinoNavy, size: 18),
@@ -86,17 +87,17 @@ class _StorePageState extends State<StorePage> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 15),
-              decoration: BoxDecoration(
-                color: pinoNavy,
+              decoration: const BoxDecoration(
+                color: Colors.white,
                 borderRadius:
-                    const BorderRadius.vertical(bottom: Radius.circular(30)),
+                    BorderRadius.vertical(bottom: Radius.circular(30)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text("رصيدك الحالي: ",
                       style: TextStyle(
-                          color: Colors.white70,
+                          color: pinoNavy,
                           fontSize: 14,
                           fontFamily: 'Vazirmatn')),
                   Text("$userHearts",

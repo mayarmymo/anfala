@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-const Color pinoNavy = Color(0xFF1E2A47);
-const Color pinoOrange = Color(0xFFFF9F1C);
+const Color pinoNavy = Color(0xFF1E2A47); // تم تعريفها هنا
+const Color pinoOrange = Color(0xFFFF9F1C); // تم تعريفها هنا
 
 class LeaderboardPage extends StatefulWidget {
   const LeaderboardPage({super.key});
@@ -30,60 +30,37 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF0F4F8),
+        backgroundColor: Colors.white,
         body: Stack(
           children: [
             Column(
               children: [
-                // --- رأس الصفحة ومنصة التتويج ---
-                Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF1E2A47), Color(0xFF2E406E)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    borderRadius:
-                        BorderRadius.vertical(bottom: Radius.circular(40)),
-                  ),
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 10, bottom: 20),
-                      child: Column(
-                        children: [
-                          const Text("قاعة الأبطال",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Vazirmatn')),
-                          const SizedBox(height: 15),
-                          // --- منصة التتويج ثلاثية الأبعاد ---
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              _buildPodiumPlace(context,
-                                  rank: 2,
-                                  user: _leaderboardData[1],
-                                  height: 80,
-                                  color: const Color(0xFFC0C0C0)), // فضي
-                              _buildPodiumPlace(context,
-                                  rank: 1,
-                                  user: _leaderboardData[0],
-                                  height: 110,
-                                  color: const Color(0xFFFFD700)), // ذهبي
-                              _buildPodiumPlace(context,
-                                  rank: 3,
-                                  user: _leaderboardData[2],
-                                  height: 65,
-                                  color: const Color(0xFFCD7F32)), // برونزي
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                const SizedBox(height: 60),
+                // --- إعادة منصة التتويج بشكل أبيض وأنيق لحل مشكلة الصفحة البيضاء ---
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _buildPodiumPlace(context,
+                          rank: 2,
+                          user: _leaderboardData[1],
+                          height: 70,
+                          color: const Color(0xFFC0C0C0)), // فضي
+                      const SizedBox(width: 10),
+                      _buildPodiumPlace(context,
+                          rank: 1,
+                          user: _leaderboardData[0],
+                          height: 100,
+                          color: const Color(0xFFFFD700)), // ذهبي
+                      const SizedBox(width: 10),
+                      _buildPodiumPlace(context,
+                          rank: 3,
+                          user: _leaderboardData[2],
+                          height: 60,
+                          color: const Color(0xFFCD7F32)), // برونزي
+                    ],
                   ),
                 ),
                 // --- بقية القائمة ---
@@ -149,14 +126,10 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             Positioned(
               top: 45,
               right: 20,
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: Colors.white, shape: BoxShape.circle),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_forward_ios_rounded,
-                      color: pinoNavy, size: 18),
-                  onPressed: () => Navigator.pop(context),
-                ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_forward_ios_rounded,
+                    color: pinoNavy, size: 18),
+                onPressed: () => Navigator.pop(context),
               ),
             ),
           ],
@@ -174,14 +147,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     final bool isFirst = rank == 1;
     return Column(
       children: [
-        // --- التاج للمركز الأول (استخدام الصورة بشكل رأسي) ---
-        if (isFirst)
-          Image.asset("assets/images/crown.jpg",
-              height: 28,
-              width: 28,
-              errorBuilder: (c, e, s) =>
-                  const Text("👑", style: TextStyle(fontSize: 22))),
-        if (!isFirst) const SizedBox(height: 28),
         // --- الصورة الرمزية ---
         CircleAvatar(
           radius: isFirst ? 28 : 22,

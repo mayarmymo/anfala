@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 ///import 'dart:math';
+import '../pronunciation/evaluation_page.dart'; // استيراد صفحة التقييم
 
 const Color pinoNavy = Color(0xFF1E2A47);
 const Color pinoOrange = Color(0xFFFF9F1C);
@@ -144,18 +145,18 @@ class _LetterSelectionPageState extends State<LetterSelectionPage> {
       child: Scaffold(
         backgroundColor: const Color(0xFFF0F4F8),
         appBar: AppBar(
-          backgroundColor: pinoNavy,
+          backgroundColor: Colors.white,
           title: const Text("أين يختبئ بينو؟",
               style: TextStyle(
-                  color: Colors.white,
+                  color: pinoNavy,
                   fontFamily: 'Vazirmatn',
                   fontWeight: FontWeight.bold)),
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: pinoNavy, size: 18),

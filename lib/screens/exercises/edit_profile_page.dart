@@ -1,4 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const Color pinoNavy = Color(0xFF1E2A47);
 const Color pinoOrange = Color(0xFFFF9F1C);
@@ -11,8 +15,41 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final TextEditingController _nameController =
-      TextEditingController(text: "ميار");
+  final TextEditingController _nameController = TextEditingController();
+  String? _imagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _nameController.text = prefs.getString('user_name') ?? "ميار";
+      _imagePath = prefs.getString('user_image');
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imagePath = pickedFile.path;
+      });
+    }
+  }
+
+  Future<void> _saveProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_name', _nameController.text);
+    if (_imagePath != null) {
+      await prefs.setString('user_image', _imagePath!);
+    }
+    if (mounted) Navigator.pop(context);
+  }
 
   @override
   void dispose() {
@@ -27,11 +64,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: pinoNavy,
+          backgroundColor: Colors.white,
           title: const Text(
             "تعديل الملف الشخصي",
             style: TextStyle(
-                color: Colors.white,
+                color: pinoNavy,
                 fontFamily: 'Vazirmatn',
                 fontWeight: FontWeight.bold),
           ),
@@ -40,8 +77,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: pinoNavy, size: 18),
@@ -66,15 +103,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: CircleAvatar(
                       radius: 60,
                       backgroundColor: Colors.grey[200],
-                      backgroundImage:
-                          const AssetImage('assets/images/penguin_3d.jpg'),
+                      backgroundImage: _imagePath != null
+                          ? (kIsWeb
+                              ? NetworkImage(_imagePath!)
+                              : FileImage(File(_imagePath!)) as ImageProvider)
+                          : const AssetImage('assets/images/penguin_3d.jpg')
+                              as ImageProvider,
                     ),
                   ),
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: pinoNavy,
-                    child: const Icon(Icons.camera_alt,
-                        size: 20, color: Colors.white),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: pinoNavy,
+                      child: const Icon(Icons.camera_alt,
+                          size: 20, color: Colors.white),
+                    ),
                   )
                 ],
               ),
@@ -103,7 +147,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       backgroundColor: pinoOrange,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15))),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: _saveProfileData,
                   child: const Text("حفظ التغييرات",
                       style: TextStyle(
                           color: Colors.white,

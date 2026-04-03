@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-const Color pinoNavy = Color(0xFF1E2A47);
-const Color pinoOrange = Color(0xFFFF9F1C);
+const Color pinoNavy = Color(0xFF1E2A47); // تم تعريفها هنا
+const Color pinoOrange = Color(0xFFFF9F1C); // تم تعريفها هنا
 const String appFont = 'Vazirmatn';
 
 class AchievementsPage extends StatelessWidget {
@@ -41,7 +41,7 @@ class AchievementsPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: pinoNavy,
+          backgroundColor: Colors.white,
           elevation: 0,
           automaticallyImplyLeading: false,
           centerTitle: true,
@@ -49,7 +49,7 @@ class AchievementsPage extends StatelessWidget {
             "الإنجازات",
             style: TextStyle(
               fontFamily: appFont,
-              color: Colors.white,
+              color: pinoNavy,
               fontWeight: FontWeight.bold,
               fontSize: 20,
             ),
@@ -57,8 +57,8 @@ class AchievementsPage extends StatelessWidget {
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: pinoNavy, size: 18),

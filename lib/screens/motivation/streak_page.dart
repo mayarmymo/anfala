@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 // الألوان الخاصة بهوية "بينو" البصرية
 const Color pinoNavy = Color(0xFF1E2A47); // الكحلي الأساسي
-const Color pinoOrange = Color(0xFFFF9F1C); // البرتقالي الثانوي
+const Color pinoOrange =
+    Color(0xFFFF9F1C); // البرتقالي الثانوي // تم تعريفها هنا
 const String appFont = 'Vazirmatn';
 
 // تأكدي من تسمية الكلاس ليتوافق مع طريقة استدعائك له في التطبيق
@@ -26,19 +27,19 @@ class StreakPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: pinoNavy,
+          backgroundColor: Colors.white,
           elevation: 0,
           automaticallyImplyLeading: false, // مهم جداً
           title: const Text(
             " السلسلة ", // أو عنوان الصفحة
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(color: pinoNavy, fontWeight: FontWeight.bold),
           ),
           centerTitle: true,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: pinoNavy, size: 18),

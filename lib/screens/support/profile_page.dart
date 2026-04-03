@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'settings_page.dart';
 import 'statistics_page.dart';
 import '../exercises/edit_profile_page.dart';
@@ -6,8 +9,30 @@ import '../exercises/edit_profile_page.dart';
 const Color pinoNavy = Color(0xFF1E2A47);
 const Color pinoOrange = Color(0xFFFF9F1C);
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String _userName = "ميار";
+  String? _imagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userName = prefs.getString('user_name') ?? "ميار";
+      _imagePath = prefs.getString('user_image');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +41,13 @@ class ProfilePage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: pinoNavy,
+          backgroundColor: Colors.white,
           elevation: 0,
           centerTitle: true,
           title: const Text(
             "ملفي الشخصي",
             style: TextStyle(
-                color: Colors.white,
+                color: pinoNavy,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Vazirmatn'),
@@ -31,8 +56,8 @@ class ProfilePage extends StatelessWidget {
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: pinoNavy, size: 18),
@@ -42,7 +67,7 @@ class ProfilePage extends StatelessWidget {
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
+              icon: const Icon(Icons.settings, color: pinoNavy),
               onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -64,21 +89,25 @@ class ProfilePage extends StatelessWidget {
                   ]),
               child: Column(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 55,
                     backgroundColor: pinoNavy,
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundImage:
-                          AssetImage('assets/images/penguin_3d.jpg'),
+                      backgroundImage: _imagePath != null
+                          ? (kIsWeb
+                              ? NetworkImage(_imagePath!)
+                              : FileImage(File(_imagePath!)) as ImageProvider)
+                          : const AssetImage('assets/images/penguin_3d.jpg')
+                              as ImageProvider,
                     ),
                   ),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        "ميار",
+                      Text(
+                        _userName,
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -91,10 +120,11 @@ class ProfilePage extends StatelessWidget {
                             const Icon(Icons.edit, color: pinoOrange, size: 20),
                         onPressed: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const EditProfilePage()));
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const EditProfilePage()))
+                              .then((_) => _loadData());
                         },
                       ),
                     ],
@@ -182,7 +212,7 @@ class ProfilePage extends StatelessWidget {
         trailing: Text(
           value,
           style: const TextStyle(
-              color: pinoOrange, // تم توحيد اللون البرتقالي للقيم المميزة
+              color: pinoNavy,
               fontWeight: FontWeight.bold,
               fontSize: 16,
               fontFamily: 'Vazirmatn'),

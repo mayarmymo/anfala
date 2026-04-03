@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 // الحفاظ على ألوانك الأصلية
+import '../pronunciation/evaluation_page.dart'; // استيراد صفحة التقييم
+
 const Color pinoNavy = Color(0xFF1E2A47);
 const Color pinoOrange = Color(0xFFFF9F1C);
 const Color pinoBg = Colors.white;
@@ -54,18 +56,18 @@ class _AdvancedExercisesPageState extends State<AdvancedExercisesPage> {
         appBar: AppBar(
           title: const Text("تمارين الترتيب",
               style: TextStyle(
-                  color: Colors.white,
+                  color: pinoNavy,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Vazirmatn')),
-          backgroundColor: pinoNavy,
+          backgroundColor: Colors.white,
           centerTitle: true,
           elevation: 0,
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: pinoNavy, size: 18),
@@ -200,16 +202,18 @@ class _AdvancedExercisesPageState extends State<AdvancedExercisesPage> {
                         borderRadius: BorderRadius.circular(12))),
                 onPressed: () {
                   bool isCorrect = list.join("|") == correctList.join("|");
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(isCorrect
-                        ? "أحسنت! ترتيب رائع 🌟"
-                        : "حاول مرة أخرى يا بطل! 🦾"),
-                    backgroundColor: isCorrect ? Colors.green : pinoOrange,
-                  ));
-                  if (isCorrect) {
-                    if (onComplete != null) onComplete();
-                    Navigator.pop(context);
-                  }
+                  int score = isCorrect ? 100 : 0;
+
+                  Navigator.pop(context); // إغلاق الـ BottomSheet
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EvaluationPage(score: score),
+                    ),
+                  ).then((_) {
+                    if (isCorrect && onComplete != null)
+                      onComplete(); // تنفيذ onComplete بعد العودة من صفحة التقييم
+                  });
                 },
                 child: const Text("تحقق من الإجابة",
                     style: TextStyle(

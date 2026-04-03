@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../pronunciation/evaluation_page.dart'; // استيراد صفحة التقييم
 
 // تعريف الألوان الموحدة للتطبيق
 const Color pinoNavy = Color(0xFF1E2A47);
@@ -50,14 +51,15 @@ class _MovementsPageState extends State<MovementsPage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: pinoNavy,
+          backgroundColor: Colors.white,
+          elevation: 0,
           centerTitle: true,
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
               child: IconButton(
                 icon: const Icon(Icons.arrow_forward_ios_rounded,
                     color: pinoNavy, size: 18),
@@ -66,8 +68,7 @@ class _MovementsPageState extends State<MovementsPage> {
             ),
           ),
           title: const Text("تعلم الحركات",
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              style: TextStyle(color: pinoNavy, fontWeight: FontWeight.bold)),
         ),
         body: stage == 0 ? _buildLearningStage(score) : _buildQuizStage(),
       ),
@@ -78,9 +79,7 @@ class _MovementsPageState extends State<MovementsPage> {
   Widget _buildLearningStage(int score) {
     return Column(
       children: [
-        const SizedBox(height: 25),
-        const Text("اضغط على الحركة لتعلمها",
-            style: TextStyle(fontSize: 18, color: pinoNavy)),
+        const SizedBox(height: 10),
         const SizedBox(height: 10),
         Text("أنجز الحركات ($score/3)",
             style: const TextStyle(
@@ -257,54 +256,12 @@ class _MovementsPageState extends State<MovementsPage> {
   }
 
   void _showResult() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text("انتهى الاختبار! 🎉",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: pinoNavy, fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // تم استبدال أيقونة النجمة بصورة القمر
-            Image.asset(
-              "assets/images/happy.jpg", // تأكد من أن هذا المسار صحيح وأن الصورة موجودة في المشروع
-              height: 80,
-              width: 80,
-            ),
-            const SizedBox(height: 15),
-            const Text("نتيجتك الرائعة هي:",
-                style: TextStyle(fontSize: 18, color: pinoNavy)),
-            Text("$correctAnswers من 3",
-                style: const TextStyle(
-                    fontSize: 35,
-                    fontWeight: FontWeight.bold,
-                    color: pinoOrange)),
-          ],
-        ),
-        actions: [
-          Center(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: pinoNavy, foregroundColor: Colors.white),
-              onPressed: () {
-                Navigator.pop(context);
-                setState(() {
-                  stage = 0;
-                  currentQuestion = 0;
-                  correctAnswers = 0;
-                  for (var m in movements) {
-                    m["done"] = false;
-                  }
-                });
-              },
-              child: const Text("العودة للتعلم"),
-            ),
-          ),
-          const SizedBox(height: 10),
-        ],
+    int finalScore = (correctAnswers * (100 ~/ 3)); // حساب النتيجة من 100
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EvaluationPage(score: finalScore),
       ),
     );
   }
