@@ -56,14 +56,9 @@ class AchievementsPage extends StatelessWidget {
           ),
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
@@ -77,11 +72,11 @@ class AchievementsPage extends StatelessWidget {
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
                 color: const Color(0xFFF5F7F9), // الخلفية الرمادية الفاتحة
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(15), // تقليل الاستدارة قليلاً
               ),
               child: Row(
                 children: [
-                  Icon(item['icon'], color: item['color'], size: 30),
+                  Icon(item['icon'], color: pinoNavy, size: 30), // أيقونة كحلية
                   const SizedBox(width: 15),
                   Expanded(
                     child: Column(
@@ -112,10 +107,8 @@ class AchievementsPage extends StatelessWidget {
                               widthFactor: item['progress'],
                               child: Container(
                                 height: 8,
-                                decoration: BoxDecoration(
-                                  color: item['progress'] == 1.0
-                                      ? pinoOrange
-                                      : item['color'],
+                                decoration: BoxDecoration( // شريط التقدم كحلي
+                                  color: pinoNavy, 
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
@@ -131,7 +124,7 @@ class AchievementsPage extends StatelessWidget {
                     style: const TextStyle(
                       fontFamily: appFont,
                       fontSize: 14,
-                      color: pinoNavy,
+                      color: pinoNavy, // الخط كحلي
                       fontWeight: FontWeight.bold,
                     ),
                   ),

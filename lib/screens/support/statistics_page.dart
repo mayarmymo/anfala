@@ -25,14 +25,9 @@ class StatisticsPage extends StatelessWidget {
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
           elevation: 0,
@@ -66,12 +61,12 @@ class StatisticsPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        _buildBar("ح", 0.4, pinoOrange),
-                        _buildBar("ن", 0.8, pinoOrange),
-                        _buildBar("ث", 0.6, pinoOrange),
+                        _buildBar("ح", 0.4, pinoNavy),
+                        _buildBar("ن", 0.8, pinoNavy),
+                        _buildBar("ث", 0.6, pinoNavy),
                         _buildBar("ر", 0.9, pinoNavy),
-                        _buildBar("خ", 0.5, pinoOrange),
-                        _buildBar("ج", 0.3, pinoOrange),
+                        _buildBar("خ", 0.5, pinoNavy),
+                        _buildBar("ج", 0.3, pinoNavy),
                       ],
                     ),
                   ],
@@ -86,10 +81,10 @@ class StatisticsPage extends StatelessWidget {
                 mainAxisSpacing: 15,
                 children: [
                   _buildStatItem(
-                      "كلمات متقنة", "48", Icons.spellcheck, pinoOrange),
+                      "كلمات متقنة", "48", Icons.spellcheck, pinoNavy),
                   _buildStatItem("وقت التمرين", "5.2 س", Icons.timer, pinoNavy),
                   _buildStatItem(
-                      "دقة النطق", "92%", Icons.auto_graph, pinoOrange),
+                      "دقة النطق", "92%", Icons.auto_graph, pinoNavy),
                   _buildStatItem("أعلى سلسلة", "15 يوم",
                       Icons.local_fire_department, pinoNavy),
                 ],

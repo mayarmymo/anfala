@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../pronunciation/evaluation_page.dart'; // استيراد صفحة التقييم
+import 'package:shared_preferences/shared_preferences.dart';
 
 // تعريف الألوان الموحدة للتطبيق
 const Color pinoNavy = Color(0xFF1E2A47);
@@ -17,6 +17,34 @@ class _MovementsPageState extends State<MovementsPage> {
   int stage = 0; // 0 للتعلم، 1 للاختبار
   int currentQuestion = 0;
   int correctAnswers = 0;
+  double _progress = 0.0;
+  int _userHearts = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProgress();
+  }
+
+  Future<void> _loadProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    int count = 0;
+    List<String> keys = [
+      'ex_speech',
+      'ex_movements',
+      'ex_advanced',
+      'ex_chef',
+      'ex_pino',
+      'ex_levels'
+    ];
+    for (String key in keys) {
+      if (prefs.getBool(key) ?? false) count++;
+    }
+    setState(() {
+      _progress = count / 6;
+      _userHearts = prefs.getInt('user_hearts') ?? 60;
+    });
+  }
 
   // قائمة البيانات الأساسية
   final List<Map<String, dynamic>> movements = [
@@ -57,20 +85,49 @@ class _MovementsPageState extends State<MovementsPage> {
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
-          title: const Text("تعلم الحركات",
-              style: TextStyle(color: pinoNavy, fontWeight: FontWeight.bold)),
+          title: Text(stage == 0 ? "تعلم الحركات" : "",
+              style: const TextStyle(
+                  color: pinoNavy, fontWeight: FontWeight.bold)),
         ),
-        body: stage == 0 ? _buildLearningStage(score) : _buildQuizStage(),
+        body: Column(
+          children: [
+            // شريط التقدم العلوي
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        value: _progress,
+                        minHeight: 8,
+                        backgroundColor: pinoNavy.withOpacity(0.1),
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(pinoNavy),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.favorite, color: Colors.red, size: 22),
+                  const SizedBox(width: 5),
+                  Text("$_userHearts",
+                      style: const TextStyle(
+                          color: pinoNavy, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            Expanded(
+              child:
+                  stage == 0 ? _buildLearningStage(score) : _buildQuizStage(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -80,10 +137,6 @@ class _MovementsPageState extends State<MovementsPage> {
     return Column(
       children: [
         const SizedBox(height: 10),
-        const SizedBox(height: 10),
-        Text("أنجز الحركات ($score/3)",
-            style: const TextStyle(
-                fontSize: 22, fontWeight: FontWeight.bold, color: pinoNavy)),
         const SizedBox(height: 15),
 
         // عرض القلوب (التقدم)
@@ -114,7 +167,7 @@ class _MovementsPageState extends State<MovementsPage> {
             padding: const EdgeInsets.only(bottom: 40, left: 20, right: 20),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  backgroundColor: pinoOrange,
+                  backgroundColor: pinoNavy,
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 60),
                   shape: RoundedRectangleBorder(
@@ -178,8 +231,6 @@ class _MovementsPageState extends State<MovementsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("سؤال ${currentQuestion + 1} من 3",
-                style: const TextStyle(fontSize: 16, color: pinoNavy)),
             const SizedBox(height: 5),
             const Text("ما هي الحركة الموضحة في الصورة؟",
                 textAlign: TextAlign.center,
@@ -255,13 +306,64 @@ class _MovementsPageState extends State<MovementsPage> {
     }
   }
 
-  void _showResult() {
-    int finalScore = (correctAnswers * (100 ~/ 3)); // حساب النتيجة من 100
+  Future<void> _showResult() async {
+    // حفظ الإنجاز وزيادة القلوب
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('ex_movements', true);
+    if (correctAnswers == 3) {
+      int hearts = prefs.getInt('user_hearts') ?? 60;
+      await prefs.setInt('user_hearts', hearts + 10);
+    }
+    _loadProgress(); // تحديث شريط التقدم
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EvaluationPage(score: finalScore),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text("انتهى الاختبار! 🎉",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: pinoNavy, fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // تم استبدال أيقونة النجمة بصورة القمر
+            Image.asset(
+              "assets/images/happy.jpg", // تأكد من أن هذا المسار صحيح وأن الصورة موجودة في المشروع
+              height: 80,
+              width: 80,
+            ),
+            const SizedBox(height: 15),
+            const Text("نتيجتك الرائعة هي:",
+                style: TextStyle(fontSize: 18, color: pinoNavy)),
+            Text("$correctAnswers من 3",
+                style: const TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.bold,
+                    color: pinoOrange)),
+          ],
+        ),
+        actions: [
+          Center(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: pinoNavy, foregroundColor: Colors.white),
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  stage = 0;
+                  currentQuestion = 0;
+                  correctAnswers = 0;
+                  for (var m in movements) {
+                    m["done"] = false;
+                  }
+                });
+              },
+              child: const Text("العودة للتعلم"),
+            ),
+          ),
+          const SizedBox(height: 10),
+        ],
       ),
     );
   }

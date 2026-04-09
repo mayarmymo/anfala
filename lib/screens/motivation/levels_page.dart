@@ -34,7 +34,7 @@ class _LevelsPageState extends State<LevelsPage> {
       'title': "المرحلة الثانية: الأسد",
       'desc': "رتب حروف كلمة أسد",
       'icon': Icons.pets,
-      'color': Colors.orange,
+      'color': pinoNavy,
       'wordTitle': 'أسد',
       'targetLetters': ['أ', 'س', 'د'],
       'imagePath': 'assets/images/lion.jpg',
@@ -82,19 +82,14 @@ class _LevelsPageState extends State<LevelsPage> {
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
         body: ListView.builder(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           itemCount: _levelData.length,
           itemBuilder: (context, index) {
             final level = _levelData[index];
@@ -120,13 +115,6 @@ class _LevelsPageState extends State<LevelsPage> {
                             ),
                           ),
                         ).then((_) => _loadLevelStatus()),
-                leading: CircleAvatar(
-                  backgroundColor: isLocked
-                      ? Colors.grey[300]
-                      : level['color'].withOpacity(0.1),
-                  child: Icon(level['icon'],
-                      color: isLocked ? Colors.grey : level['color']),
-                ),
                 title: Text(level['title'],
                     style: TextStyle(
                         fontWeight: FontWeight.bold,

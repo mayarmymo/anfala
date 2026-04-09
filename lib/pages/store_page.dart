@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/store_item.dart';
 
 // تم تعريفها هنا
@@ -13,7 +14,20 @@ class StorePage extends StatefulWidget {
 }
 
 class _StorePageState extends State<StorePage> {
-  int userHearts = 60; // الرصيد الافتراضي بالقلوب
+  int userHearts = 60;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHearts();
+  }
+
+  Future<void> _loadHearts() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userHearts = prefs.getInt('user_hearts') ?? 60;
+    });
+  }
 
   // قائمة العناصر بمسارات الصور والأسعار
   List<StoreItem> items = [
@@ -24,12 +38,14 @@ class _StorePageState extends State<StorePage> {
   ];
 
   // دالة الشراء
-  void _buyItem(StoreItem item) {
+  Future<void> _buyItem(StoreItem item) async {
     if (userHearts >= item.price) {
+      final prefs = await SharedPreferences.getInstance();
       setState(() {
         userHearts -= item.price;
         item.isBought = true;
       });
+      await prefs.setInt('user_hearts', userHearts);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("مبروك! حصلت على ${item.name}",
@@ -70,14 +86,9 @@ class _StorePageState extends State<StorePage> {
           centerTitle: true,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
@@ -102,7 +113,7 @@ class _StorePageState extends State<StorePage> {
                           fontFamily: 'Vazirmatn')),
                   Text("$userHearts",
                       style: TextStyle(
-                          color: pinoOrange,
+                          color: pinoNavy,
                           fontSize: 22,
                           fontWeight: FontWeight.bold)),
                   const SizedBox(width: 8),
@@ -157,7 +168,7 @@ class _StorePageState extends State<StorePage> {
             decoration: BoxDecoration(
               color: item.isBought
                   ? Colors.green.withOpacity(0.1)
-                  : pinoOrange.withOpacity(0.1),
+                  : pinoNavy.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: ClipOval(

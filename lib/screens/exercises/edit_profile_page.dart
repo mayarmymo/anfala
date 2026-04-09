@@ -76,14 +76,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
@@ -99,7 +94,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: pinoOrange, width: 3)),
+                        border: Border.all(color: pinoNavy, width: 3)),
                     child: CircleAvatar(
                       radius: 60,
                       backgroundColor: Colors.grey[200],
@@ -144,7 +139,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 height: 55,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: pinoOrange,
+                      backgroundColor: pinoNavy,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15))),
                   onPressed: _saveProfileData,

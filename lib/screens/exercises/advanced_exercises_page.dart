@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // الحفاظ على ألوانك الأصلية
-import '../pronunciation/evaluation_page.dart'; // استيراد صفحة التقييم
 
 const Color pinoNavy = Color(0xFF1E2A47);
 const Color pinoOrange = Color(0xFFFF9F1C);
@@ -16,6 +16,34 @@ class AdvancedExercisesPage extends StatefulWidget {
 
 class _AdvancedExercisesPageState extends State<AdvancedExercisesPage> {
   bool _isLevel2Locked = true;
+  double _progress = 0.0;
+  int _userHearts = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProgress();
+  }
+
+  Future<void> _loadProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    int count = 0;
+    List<String> keys = [
+      'ex_speech',
+      'ex_movements',
+      'ex_advanced',
+      'ex_chef',
+      'ex_pino',
+      'ex_levels'
+    ];
+    for (String key in keys) {
+      if (prefs.getBool(key) ?? false) count++;
+    }
+    setState(() {
+      _progress = count / 6;
+      _userHearts = prefs.getInt('user_hearts') ?? 60;
+    });
+  }
 
   // المرحلة 1: الجملة الجديدة (الأرنب والجزرة)
   final List<String> _sentenceWords = [
@@ -54,7 +82,7 @@ class _AdvancedExercisesPageState extends State<AdvancedExercisesPage> {
       child: Scaffold(
         backgroundColor: pinoBg,
         appBar: AppBar(
-          title: const Text("تمارين الترتيب",
+          title: const Text("تمرين الترتيب",
               style: TextStyle(
                   color: pinoNavy,
                   fontWeight: FontWeight.bold,
@@ -65,44 +93,70 @@ class _AdvancedExercisesPageState extends State<AdvancedExercisesPage> {
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
-        body: ListView(
-          padding: const EdgeInsets.all(20),
+        body: Column(
           children: [
-            _buildLevelCard(
-                "المرحلة 1: ترتيب جملة",
-                "رتب كلمات الجملة بشكل صحيح",
-                Icons.star_rounded,
-                Colors.orange,
-                _showLevel1Dialog),
-            const SizedBox(height: 15),
-            _buildLevelCard(
-                "المرحلة 2: ترتيب القصة",
-                _isLevel2Locked
-                    ? "أكمل المرحلة الأولى للفتح"
-                    : "رتب أحداث قصة الفيل والبالون",
-                _isLevel2Locked ? Icons.lock : Icons.auto_stories,
-                _isLevel2Locked ? Colors.grey : Colors.blue,
-                _isLevel2Locked
-                    ? () {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
-                          content:
-                              Text("يجب عليك إكمال المرحلة الأولى أولاً! 🔒"),
-                          backgroundColor: pinoOrange,
-                        ));
-                      }
-                    : _showLevel2Dialog),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        value: _progress,
+                        minHeight: 8,
+                        backgroundColor: pinoNavy.withOpacity(0.1),
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(pinoNavy),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.favorite, color: Colors.red, size: 22),
+                  const SizedBox(width: 5),
+                  Text("$_userHearts",
+                      style: const TextStyle(
+                          color: pinoNavy, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  _buildLevelCard(
+                      "المرحلة 1: ترتيب جملة",
+                      "رتب كلمات الجملة بشكل صحيح",
+                      Icons.star_rounded,
+                      Colors.orange,
+                      _showLevel1Dialog),
+                  const SizedBox(height: 15),
+                  _buildLevelCard(
+                      "المرحلة 2: ترتيب القصة",
+                      _isLevel2Locked
+                          ? "أكمل المرحلة الأولى للفتح"
+                          : "رتب أحداث قصة الفيل والبالون",
+                      _isLevel2Locked ? Icons.lock : Icons.auto_stories,
+                      _isLevel2Locked ? Colors.grey : Colors.blue,
+                      _isLevel2Locked
+                          ? () {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text(
+                                    "يجب عليك إكمال المرحلة الأولى أولاً! 🔒"),
+                                backgroundColor: pinoNavy,
+                              ));
+                            }
+                          : _showLevel2Dialog),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -115,7 +169,7 @@ class _AdvancedExercisesPageState extends State<AdvancedExercisesPage> {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: ListTile(
-        leading: Icon(icon, color: color, size: 35),
+        leading: Icon(icon, color: pinoNavy, size: 30),
         title: Text(title,
             style: const TextStyle(
                 fontWeight: FontWeight.bold,
@@ -123,8 +177,6 @@ class _AdvancedExercisesPageState extends State<AdvancedExercisesPage> {
                 color: pinoNavy)),
         subtitle: Text(subtitle,
             style: const TextStyle(fontFamily: 'Vazirmatn', color: pinoNavy)),
-        trailing:
-            const Icon(Icons.play_arrow_rounded, color: Colors.green, size: 30),
         onTap: onTap,
       ),
     );
@@ -196,24 +248,29 @@ class _AdvancedExercisesPageState extends State<AdvancedExercisesPage> {
               const SizedBox(height: 10),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: pinoOrange,
+                    backgroundColor: pinoNavy,
                     minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12))),
-                onPressed: () {
+                onPressed: () async {
                   bool isCorrect = list.join("|") == correctList.join("|");
-                  int score = isCorrect ? 100 : 0;
-
+                  if (isCorrect) {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool('ex_advanced', true);
+                    int hearts = prefs.getInt('user_hearts') ?? 60;
+                    await prefs.setInt('user_hearts', hearts + 10);
+                    _loadProgress(); // تحديث شريط التقدم فوراً
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(isCorrect
+                        ? "أحسنت! ترتيب رائع 🌟"
+                        : "غلط حاول مره اخرى"),
+                    backgroundColor: isCorrect ? Colors.green : pinoNavy,
+                  ));
                   Navigator.pop(context); // إغلاق الـ BottomSheet
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EvaluationPage(score: score),
-                    ),
-                  ).then((_) {
-                    if (isCorrect && onComplete != null)
-                      onComplete(); // تنفيذ onComplete بعد العودة من صفحة التقييم
-                  });
+                  if (isCorrect && onComplete != null) {
+                    onComplete(); // تنفيذ onComplete
+                  }
                 },
                 child: const Text("تحقق من الإجابة",
                     style: TextStyle(

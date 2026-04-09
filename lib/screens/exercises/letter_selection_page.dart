@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-
-///import 'dart:math';
-import '../pronunciation/evaluation_page.dart'; // استيراد صفحة التقييم
+import 'package:shared_preferences/shared_preferences.dart';
 
 const Color pinoNavy = Color(0xFF1E2A47);
-const Color pinoOrange = Color(0xFFFF9F1C);
 
 class LetterSelectionPage extends StatefulWidget {
   const LetterSelectionPage({super.key});
@@ -20,13 +17,36 @@ class _LetterSelectionPageState extends State<LetterSelectionPage> {
   late List<String> _boxLetters;
   String? _selectedLetter;
   bool _showPino = false;
+  double _progress = 0.0;
+  int _userHearts = 0;
 
   @override
   void initState() {
     super.initState();
+    _loadProgress();
     _generateNewLevel();
     // تشغيل الصوت تلقائياً عند فتح الصفحة
     _playPinoSound();
+  }
+
+  Future<void> _loadProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    int count = 0;
+    List<String> keys = [
+      'ex_speech',
+      'ex_movements',
+      'ex_advanced',
+      'ex_chef',
+      'ex_pino',
+      'ex_levels'
+    ];
+    for (String key in keys) {
+      if (prefs.getBool(key) ?? false) count++;
+    }
+    setState(() {
+      _progress = count / 6;
+      _userHearts = prefs.getInt('user_hearts') ?? 60;
+    });
   }
 
   void _generateNewLevel() {
@@ -75,39 +95,30 @@ class _LetterSelectionPageState extends State<LetterSelectionPage> {
         _showPino = true;
       });
 
-      // تشغيل الصوت عند العثور على بينو
-      _playPinoSound();
-
       // إظهار نافذة النجاح بعد ثانيتين من ظهور البطريق
-      Future.delayed(const Duration(seconds: 2), () {
-        _showSuccessDialog();
-      });
-    } else {
-      // رسالة خطأ سريعة
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("أوه! لا يوجد أحد هنا.. حاول مرة أخرى! ❌",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: 'Vazirmatn')),
-          backgroundColor: Colors.redAccent,
-          duration: Duration(seconds: 1),
-        ),
-      );
+      Future.delayed(const Duration(seconds: 2), () => _showSuccessDialog());
     }
   }
 
-  void _showSuccessDialog() {
+  Future<void> _showSuccessDialog() async {
+    // حفظ الإنجاز وزيادة القلوب فعلياً
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('ex_pino', true);
+    int hearts = prefs.getInt('user_hearts') ?? 60;
+    await prefs.setInt('user_hearts', hearts + 10);
+    _loadProgress(); // تحديث شريط التقدم
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text("وجدته! 🎉",
+        title: const Text("وجدته", // The text itself
             textAlign: TextAlign.center,
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Vazirmatn',
-                color: pinoNavy)),
+                color: pinoNavy)), // Ensures the color is pinoNavy
         content: const Text("أنت بطل رائع، لقد عثرت على بينو خلف حرف السين!",
             textAlign: TextAlign.center,
             style: TextStyle(fontFamily: 'Vazirmatn', color: pinoNavy)),
@@ -115,7 +126,7 @@ class _LetterSelectionPageState extends State<LetterSelectionPage> {
           Center(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                  backgroundColor: pinoOrange,
+                  backgroundColor: pinoNavy,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10))),
               onPressed: () {
@@ -140,6 +151,7 @@ class _LetterSelectionPageState extends State<LetterSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -154,62 +166,57 @@ class _LetterSelectionPageState extends State<LetterSelectionPage> {
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
           centerTitle: true,
           elevation: 0,
         ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("بينو يحب الاختباء..",
-                style: TextStyle(
-                    fontSize: 22, color: pinoNavy, fontFamily: 'Vazirmatn')),
-            const SizedBox(height: 5),
-            const Text("اضغط على الصندوق الذي يخبئ حرف (س)",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: pinoNavy,
-                    fontFamily: 'Vazirmatn')),
-
-            const SizedBox(height: 100), // مساحة لظهور البطريق من الخلف
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: _boxLetters
-                  .map((letter) => _buildAnimatedBox(letter))
-                  .toList(),
+            // شريط التقدم العلوي
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        value: _progress,
+                        minHeight: 8,
+                        backgroundColor: pinoNavy.withOpacity(0.1),
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(pinoNavy),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.favorite, color: Colors.red, size: 22),
+                  const SizedBox(width: 5),
+                  Text("$_userHearts",
+                      style: const TextStyle(
+                          color: pinoNavy, fontWeight: FontWeight.bold)),
+                ],
+              ),
             ),
-
-            const SizedBox(height: 60),
-
-            // زر إعادة تشغيل الصوت بشكل يدوي
-            Column(
-              children: [
-                IconButton(
-                  onPressed: _playPinoSound,
-                  icon: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: pinoNavy.withOpacity(0.1),
-                          shape: BoxShape.circle),
-                      child: Icon(Icons.volume_up, color: pinoNavy, size: 45)),
-                ),
-                const Text("إعادة سماع الصوت",
-                    style: TextStyle(
-                        color: Color(0xFF1E2A47),
-                        fontSize: 12,
-                        fontFamily: 'Vazirmatn')),
-              ],
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: screenWidth * 0.2),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: _boxLetters
+                        .map((letter) => _buildAnimatedBox(letter))
+                        .toList(),
+                  ),
+                  const SizedBox(height: 60),
+                  _buildAudioButton(),
+                ],
+              ),
             ),
           ],
         ),
@@ -217,8 +224,30 @@ class _LetterSelectionPageState extends State<LetterSelectionPage> {
     );
   }
 
+  Widget _buildAudioButton() {
+    return Column(
+      children: [
+        IconButton(
+          onPressed: _playPinoSound,
+          icon: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
+              child: Icon(Icons.volume_up, color: pinoNavy, size: 45)),
+        ),
+        const Text("إعادة سماع الصوت",
+            style: TextStyle(
+                color: Color(0xFF1E2A47),
+                fontSize: 12,
+                fontFamily: 'Vazirmatn')),
+      ],
+    );
+  }
+
   Widget _buildAnimatedBox(String letter) {
     bool isCorrect = (letter == _targetLetter && _showPino);
+    double screenWidth = MediaQuery.of(context).size.width;
+    double boxSize = (screenWidth - 60) / 3;
 
     return GestureDetector(
       onTap: () => _checkAnswer(letter),
@@ -230,13 +259,13 @@ class _LetterSelectionPageState extends State<LetterSelectionPage> {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 700),
             curve: Curves.elasticOut,
-            bottom: isCorrect ? 90 : 0,
+            bottom: isCorrect ? boxSize * 0.9 : 0,
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 300),
               opacity: isCorrect ? 1.0 : 0.0,
               child: SizedBox(
-                height: 100,
-                width: 80,
+                height: boxSize,
+                width: boxSize * 0.8,
                 child:
                     Image.asset("assets/images/peno.jpg", fit: BoxFit.contain),
               ),
@@ -244,27 +273,30 @@ class _LetterSelectionPageState extends State<LetterSelectionPage> {
           ),
           // الصندوق الملون (الحرف)
           Container(
-            width: 95,
-            height: 95,
+            width: boxSize,
+            height: boxSize,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: pinoOrange,
+              color: pinoNavy,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
-                    color: Colors.black12, blurRadius: 10, offset: Offset(0, 5))
+                    color: pinoNavy.withAlpha(150), offset: const Offset(0, 5))
               ],
               border: Border.all(
                 color: _selectedLetter == letter
-                    ? (letter == _targetLetter ? Colors.green : Colors.red)
+                    ? (letter == _targetLetter
+                        ? const Color(0xFF58CC02)
+                        : Colors.red)
                     : Colors.white,
                 width: 4,
               ),
             ),
             child: Text(
               letter,
-              style: const TextStyle(
-                  fontSize: 48,
+              style: TextStyle(
+                  // Removed const
+                  fontSize: boxSize * 0.5,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   fontFamily: 'Vazirmatn'),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../pronunciation/evaluation_page.dart'; // استيراد صفحة التقييم
+import 'package:shared_preferences/shared_preferences.dart';
 
 const Color pinoNavy = Color(0xFF1E2A47); // الكحلي الأساسي
 const Color pinoOrange = Color(0xFFFF9F1C); // البرتقالي
@@ -17,14 +17,37 @@ class _PinoChefPageState extends State<PinoChefPage>
   List<String> potIngredients = [];
   final String targetWord = "مكرونة"; // الكلمة المستهدفة
   late AnimationController _steamController;
+  double _progress = 0.0;
+  int _userHearts = 0;
 
   @override
   void initState() {
     super.initState();
+    _loadProgress();
     _steamController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat();
+  }
+
+  Future<void> _loadProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    int count = 0;
+    List<String> keys = [
+      'ex_speech',
+      'ex_movements',
+      'ex_advanced',
+      'ex_chef',
+      'ex_pino',
+      'ex_levels'
+    ];
+    for (String key in keys) {
+      if (prefs.getBool(key) ?? false) count++;
+    }
+    setState(() {
+      _progress = count / 6;
+      _userHearts = prefs.getInt('user_hearts') ?? 60;
+    });
   }
 
   @override
@@ -51,22 +74,82 @@ class _PinoChefPageState extends State<PinoChefPage>
     }
   }
 
-  void _showSuccessResult() {
-    // بدلاً من AlertDialog، ننتقل إلى صفحة التقييم
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const EvaluationPage(score: 100), // 100 نقطة للنجاح
+  Future<void> _showSuccessResult() async {
+    // حفظ الإنجاز وزيادة القلوب
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('ex_chef', true);
+    int hearts = prefs.getInt('user_hearts') ?? 60;
+    await prefs.setInt('user_hearts', hearts + 10);
+    _loadProgress(); // تحديث شريط التقدم
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white, // تغيير الخلفية إلى اللون الأبيض
+        surfaceTintColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ظهور صورة بينو عند النجاح
+            ClipRRect(
+              borderRadius: BorderRadius.circular(25), // زيادة استدارة الحواف
+              child: Image.asset(
+                'assets/images/chef.jpg',
+                height: 140, // تكبير الصورة قليلاً
+                width: 140, // لجعلها مربعة
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+                errorBuilder: (c, e, s) => Icon(Icons.food_bank_outlined,
+                    size: 80, color: pinoNavy.withOpacity(0.5)),
+              ),
+            ),
+            const SizedBox(height: 15),
+            Text("أحسنت! شيف متميز",
+                style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: pinoNavy,
+                    fontFamily: 'Vazirmatn')),
+            const SizedBox(height: 10),
+            const Text("😋 يم يم! طبخة (مكرونة) شهية جداً",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontFamily: 'Vazirmatn', color: pinoNavy)),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: pinoNavy,
+                shape: const StadiumBorder(),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+              ),
+              onPressed: () {
+                setState(() => potIngredients.clear());
+                Navigator.pop(context);
+              },
+              child: const Text("وصفة جديدة",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Vazirmatn')),
+            )
+          ],
+        ),
       ),
     );
   }
 
   void _showErrorResult() {
-    // بدلاً من SnackBar، ننتقل إلى صفحة التقييم
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const EvaluationPage(score: 0), // 0 نقطة للخطأ
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text("حاول مرة أخرى، احترقت المكرونة! 🔥",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontFamily: 'Vazirmatn')),
+        backgroundColor: pinoNavy,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
     setState(() => potIngredients.clear()); // مسح المكونات بعد الخطأ
@@ -92,19 +175,40 @@ class _PinoChefPageState extends State<PinoChefPage>
           ),
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: Color(0xFF1E2A47), size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
         body: Column(
           children: [
+            // إضافة شريط التقدم العلوي
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        value: _progress,
+                        minHeight: 8,
+                        backgroundColor: pinoNavy.withOpacity(0.1),
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(pinoNavy),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.favorite, color: Colors.red, size: 22),
+                  const SizedBox(width: 5),
+                  Text("$_userHearts",
+                      style: const TextStyle(
+                          color: pinoNavy, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
             _buildHeader(),
             const Spacer(),
             _buildCookingArea(),
@@ -115,6 +219,7 @@ class _PinoChefPageState extends State<PinoChefPage>
       ),
     );
   }
+
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -133,17 +238,18 @@ class _PinoChefPageState extends State<PinoChefPage>
   }
 
   Widget _buildCookingArea() {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Stack(
       alignment: Alignment.bottomCenter,
       clipBehavior: Clip.none,
       children: [
         // تأثير البخار
-        Positioned(top: -50, child: _buildSteamEffect()),
+        Positioned(top: -screenWidth * 0.12, child: _buildSteamEffect()),
 
         // القدر
         Container(
-          width: 200,
-          height: 130,
+          width: screenWidth * 0.5,
+          height: screenWidth * 0.35,
           decoration: BoxDecoration(
             color: pinoNavy,
             borderRadius: const BorderRadius.vertical(
@@ -163,9 +269,11 @@ class _PinoChefPageState extends State<PinoChefPage>
                 // مستوى "الطبخ" البرتقالي يرتفع مع كل حرف
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 500),
-                  height: (130 / targetWord.length) * potIngredients.length,
+                  height: (screenWidth * 0.35 / targetWord.length) *
+                      potIngredients.length,
                   width: double.infinity,
-                  decoration: BoxDecoration(color: pinoOrange.withOpacity(0.5)),
+                  decoration:
+                      BoxDecoration(color: Colors.white.withOpacity(0.3)),
                 ),
                 Center(
                   child: Wrap(
@@ -181,15 +289,15 @@ class _PinoChefPageState extends State<PinoChefPage>
           ),
         ),
         // مقابض القدر
-        Positioned(left: -15, top: 30, child: _buildHandle()),
-        Positioned(right: -15, top: 30, child: _buildHandle()),
+        Positioned(left: -15, top: screenWidth * 0.08, child: _buildHandle()),
+        Positioned(right: -15, top: screenWidth * 0.08, child: _buildHandle()),
       ],
     );
   }
 
   Widget _buildHandle() => Container(
-      width: 35,
-      height: 15,
+      width: 30,
+      height: 12,
       decoration: BoxDecoration(
           color: pinoNavy, borderRadius: BorderRadius.circular(5)));
 

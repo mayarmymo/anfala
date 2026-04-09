@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-
-import 'evaluation_page.dart'; // استيراد صفحة التقييم
+import 'package:shared_preferences/shared_preferences.dart';
 
 const Color pinoNavy = Color(0xFF1E2A47);
 const Color pinoOrange = Color(0xFFFF9F1C);
@@ -22,10 +21,44 @@ class _SpeechPracticePageState extends State<SpeechPracticePage> {
   String _recognizedText = "";
   String _feedbackMessage = "اضغط على الميكروفون وتحدث";
   Color _feedbackColor = pinoNavy;
+  double _progress = 0.0;
+  int _userHearts = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProgress();
+  }
+
+  Future<void> _loadProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    int count = 0;
+    List<String> keys = [
+      'ex_speech',
+      'ex_movements',
+      'ex_advanced',
+      'ex_chef',
+      'ex_pino',
+      'ex_levels'
+    ];
+    for (String key in keys) {
+      if (prefs.getBool(key) ?? false) count++;
+    }
+    setState(() {
+      _progress = count / 6;
+      _userHearts = prefs.getInt('user_hearts') ?? 60;
+    });
+  }
 
   // إزالة الحركات للمقارنة الذكية
   String normalize(String text) {
-    return text.replaceAll(RegExp(r'[ًٌٍَُِْ]'), '');
+    return text
+        .replaceAll(RegExp(r'[ًٌٍَُِْ]'), '') // إزالة الحركات
+        .replaceAll('ة', 'ه') // توحيد التاء المربوطة والهاء
+        .replaceAll('أ', 'ا') // توحيد الألفات
+        .replaceAll('إ', 'ا')
+        .replaceAll('آ', 'ا')
+        .trim();
   }
 
   void _startListening() async {
@@ -69,16 +102,22 @@ class _SpeechPracticePageState extends State<SpeechPracticePage> {
     String spoken = normalize(_recognizedText);
     String target = normalize(widget.targetWord);
 
-    int score = 0;
     if (spoken.contains(target)) {
-      score = 100; // 100 نقطة للنطق الصحيح
+      _saveSuccess();
+      _feedbackMessage = "أحسنت! نطق صحيح 🎉";
+      _feedbackColor = Colors.green;
     } else {
-      score = 0; // 0 نقطة للنطق الخاطئ
+      _feedbackMessage = "حاول مرة أخرى ❌";
+      _feedbackColor = Colors.red;
     }
+  }
 
-    // الانتقال إلى صفحة التقييم
-    Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (context) => EvaluationPage(score: score)));
+  Future<void> _saveSuccess() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('ex_speech', true);
+    int hearts = prefs.getInt('user_hearts') ?? 60;
+    await prefs.setInt('user_hearts', hearts + 10);
+    _loadProgress();
   }
 
   @override
@@ -94,14 +133,9 @@ class _SpeechPracticePageState extends State<SpeechPracticePage> {
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
           title: const Text(
@@ -116,6 +150,33 @@ class _SpeechPracticePageState extends State<SpeechPracticePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // إضافة شريط التقدم مع القلب
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value: _progress,
+                          minHeight: 8,
+                          backgroundColor: pinoNavy.withOpacity(0.1),
+                          valueColor:
+                              const AlwaysStoppedAnimation<Color>(pinoNavy),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.favorite, color: Colors.red, size: 22),
+                    const SizedBox(width: 5),
+                    Text("$_userHearts",
+                        style: const TextStyle(
+                            color: pinoNavy, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
               Text(
                 "انطق: ${widget.targetWord}",
                 style: const TextStyle(

@@ -36,6 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -55,14 +56,9 @@ class _ProfilePageState extends State<ProfilePage> {
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
           actions: [
@@ -90,10 +86,10 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 children: [
                   CircleAvatar(
-                    radius: 55,
+                    radius: screenWidth * 0.14,
                     backgroundColor: pinoNavy,
                     child: CircleAvatar(
-                      radius: 50,
+                      radius: screenWidth * 0.13,
                       backgroundImage: _imagePath != null
                           ? (kIsWeb
                               ? NetworkImage(_imagePath!)
@@ -116,8 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       IconButton(
-                        icon:
-                            const Icon(Icons.edit, color: pinoOrange, size: 20),
+                        icon: const Icon(Icons.edit, color: pinoNavy, size: 20),
                         onPressed: () {
                           Navigator.push(
                                   context,
@@ -150,22 +145,22 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   _buildInfoTile(
                       icon: Icons.emoji_events,
-                      color: Colors.amber,
-                      title: "ترتيبي العالمي",
+                      color: pinoNavy,
+                      title: "ترتيبي العالمي", // الأيقونات الكحلية في هذا القسم
                       value: "الرابع"),
                   _buildInfoTile(
                       icon: Icons.local_fire_department,
-                      color: Colors.orange,
+                      color: pinoNavy,
                       title: "سلسلة النشاط",
                       value: "يوم 15"),
                   _buildInfoTile(
                       icon: Icons.calendar_month,
-                      color: Colors.blue,
+                      color: pinoNavy,
                       title: "عضو منذ",
                       value: "فبراير 2026"),
                   _buildInfoTile(
                       icon: Icons.auto_graph,
-                      color: Colors.purple,
+                      color: pinoNavy,
                       title: "تفاصيل التقدم",
                       value: "عرض",
                       onTap: () {

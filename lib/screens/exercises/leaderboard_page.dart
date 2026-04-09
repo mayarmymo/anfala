@@ -76,12 +76,11 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 15),
                         decoration: BoxDecoration(
-                          color: isUser
-                              ? pinoOrange.withOpacity(0.1)
-                              : Colors.white,
+                          color:
+                              isUser ? pinoNavy.withOpacity(0.1) : Colors.white,
                           borderRadius: BorderRadius.circular(15),
                           border: isUser
-                              ? Border.all(color: pinoOrange, width: 1.5)
+                              ? Border.all(color: pinoNavy, width: 1.5)
                               : null,
                           boxShadow: [
                             BoxShadow(
@@ -101,18 +100,18 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                           title: Text(entry['name'],
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: isUser ? pinoOrange : pinoNavy,
+                                  color: pinoNavy,
                                   fontFamily: 'Vazirmatn')),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text("${entry['score']}",
                                   style: TextStyle(
-                                      color: pinoOrange,
+                                      color: pinoNavy,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16)),
                               const SizedBox(width: 5),
-                              Icon(Icons.star, color: pinoOrange, size: 20),
+                              const Icon(Icons.star, color: pinoNavy, size: 20),
                             ],
                           ),
                         ),
@@ -127,8 +126,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               top: 45,
               right: 20,
               child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
+                icon: const Icon(Icons.close, color: pinoNavy, size: 28),
                 onPressed: () => Navigator.pop(context),
               ),
             ),

@@ -55,9 +55,9 @@ class _SettingsPageState extends State<SettingsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("شكراً بينو!",
-                style:
-                    TextStyle(color: pinoOrange, fontWeight: FontWeight.bold)),
+            child: const Text("شكراً بينو!", // تغيير لون النص إلى كحلي
+                style: TextStyle(
+                    color: pinoNavy, fontWeight: FontWeight.bold)), // pinoNavy
           ),
         ],
       ),
@@ -81,14 +81,9 @@ class _SettingsPageState extends State<SettingsPage> {
           automaticallyImplyLeading: false,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
@@ -223,10 +218,12 @@ class _SettingsPageState extends State<SettingsPage> {
                         actions: [
                           TextButton(
                               onPressed: () => Navigator.pop(ctx),
-                              child: const Text("فهمت، لنبدأ!",
+                              child: const Text(
+                                  "فهمت، لنبدأ!", // تغيير لون النص إلى كحلي
                                   style: TextStyle(
-                                      color: pinoOrange,
-                                      fontWeight: FontWeight.bold))),
+                                      color: pinoNavy,
+                                      fontWeight:
+                                          FontWeight.bold))), // pinoNavy
                         ],
                       ),
                     );
@@ -235,7 +232,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     width: double.infinity,
                     height: 55,
                     decoration: BoxDecoration(
-                      color: pinoOrange.withOpacity(0.8),
+                      color: pinoNavy,
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: const Center(

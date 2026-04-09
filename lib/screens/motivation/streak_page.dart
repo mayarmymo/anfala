@@ -37,14 +37,9 @@ class StreakPage extends StatelessWidget {
           centerTitle: true,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                  color: pinoNavy.withOpacity(0.1), shape: BoxShape.circle),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_forward_ios_rounded,
-                    color: pinoNavy, size: 18),
-                onPressed: () => Navigator.pop(context),
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: pinoNavy, size: 28),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
@@ -81,7 +76,7 @@ class StreakPage extends StatelessWidget {
                       fontFamily: appFont, // خط Vazirmatn
                       fontSize: 110, // حجم كبير مثل تصميم Duolingo
                       fontWeight: FontWeight.w900, // عريض جداً
-                      color: pinoOrange, // الرقم بالبرتقالي ليبرز على الكحلي
+                      color: pinoNavy,
                       height: 1.0, // ضبط التباعد العمودي للنص
                     ),
                   ),
@@ -134,19 +129,20 @@ class StreakPage extends StatelessWidget {
                             height: 40,
                             decoration: BoxDecoration(
                               color: dayData["done"]
-                                  ? pinoOrange
+                                  ? pinoNavy
                                   : Colors.transparent, // برتقالي إذا اكتمل
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: dayData["done"]
-                                    ? pinoOrange
+                                    ? pinoNavy
                                     : Colors.white.withOpacity(0.5),
                                 width: 2,
                               ),
                             ),
                             child: dayData["done"]
                                 ? const Icon(Icons.check,
-                                    color: pinoNavy, size: 25) // علامة صح
+                                    color: Colors.white,
+                                    size: 25) // علامة صح بيضاء
                                 : null,
                           ),
                         ],
